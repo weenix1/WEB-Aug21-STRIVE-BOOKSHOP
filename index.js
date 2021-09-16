@@ -28,6 +28,42 @@ const loadBooks = (event) => {
     .catch((error) => console.error(error));
 };
 
+let book = [];
+const fetchCards = (query) => {
+  fetch("https://striveschool-api.herokuapp.com/search?query=" + query)
+    // WAITING
+    .then((response) => response.json())
+    .then((body) => {
+      console.log(body);
+      let row = document.querySelector(".row");
+      row.innerHTML = "";
+      book = body.book;
+
+      body.forEach((element) => {
+        console.log(element);
+        /*  let col = document.createElement("div");
+        col.className = "col-md-3"; */
+        row.innerHTML += `
+                   <div class="col-md-3">
+                       <div class="card">
+                            <img src="${element.img}" class="img-fluid h-100 w-100" alt="...">
+                            <div class="card-body">
+                                <h5 id="clamp"  class="card-title">${element.title}</h5>
+                                <p class="card-text">${element.price}€</p>
+                                <a href="#"  class="btn btn-primary mr-1"  onclick= "removeCard(event,'${element.title}','${element.img}')">Add to cart</a>
+                                <a href="#" class="btn btn-primary" style ="background-color:red" onclick="deleteCard(event)">skip</a>
+                            </div>
+                        </div>
+
+                        </div>
+                        `;
+
+        /* row.appendChild(col); */
+      });
+    })
+    .catch((error) => console.error(error));
+};
+
 function addCart() {
   removeCard;
 }
@@ -55,7 +91,15 @@ function deleteCard(event) {
 function deleteShoppingCart(event) {
   console.log(event.target);
   let removedCart = event.target.closest(".list-item");
+
   removedCart.remove();
+}
+
+function searchImages(query) {
+  asin.filter((photo) =>
+    asin.title.toLowercase().includes(query.toLowerCase())
+  );
+  fetchCards(query);
 }
 
 window.onload = () => {
