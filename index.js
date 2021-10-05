@@ -28,41 +28,65 @@ const loadBooks = (event) => {
     .catch((error) => console.error(error));
 };
 
-let book = [];
-const fetchCards = (query) => {
-  fetch("https://striveschool-api.herokuapp.com/search?query=" + query)
+const booksWrapper = document.querySelector("#books-wrapper");
+let books = [];
+let filteredBooks = [];
+const fetchCards = () => {
+  fetch("https://striveschool-api.herokuapp.com/")
     // WAITING
     .then((response) => response.json())
-    .then((body) => {
-      console.log(body);
+    .then((_body) => {
+      console.log(_body);
       let row = document.querySelector(".row");
       row.innerHTML = "";
-      book = body.book;
+      books = _body;
 
-      body.forEach((element) => {
-        console.log(element);
-        /*  let col = document.createElement("div");
-        col.className = "col-md-3"; */
-        row.innerHTML += `
-                   <div class="col-md-3">
-                       <div class="card">
-                            <img src="${element.img}" class="img-fluid h-100 w-100" alt="...">
-                            <div class="card-body">
-                                <h5 id="clamp"  class="card-title">${element.title}</h5>
-                                <p class="card-text">${element.price}€</p>
-                                <a href="#"  class="btn btn-primary mr-1"  onclick= "removeCard(event,'${element.title}','${element.img}')">Add to cart</a>
-                                <a href="#" class="btn btn-primary" style ="background-color:red" onclick="deleteCard(event)">skip</a>
-                            </div>
-                        </div>
-
-                        </div>
-                        `;
-
-        /* row.appendChild(col); */
-      });
+      console.log(book);
+      displayBooks();
     })
     .catch((error) => console.error(error));
 };
+
+function displayBooks(_books = books) {
+  booksWrapper.innerHTML = "";
+
+  _books.forEach((book) => {
+    booksWrapper.innerHTML += `
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="card">
+          <img src="${book.img}" class="img-fluid card-img-top" alt="${
+      book.title
+    }">
+          <div class="card-body">
+            <h5 class="card-title">${book.title}</h5>
+            <p class="card-text">${book.category}</p>
+            <button class="btn btn-primary" onclick="addToCart('${String(
+              book.asin
+            )}', this)">$${book.price}</button>
+            <button class="btn btn-warning" onclick="this.closest('.col-12').remove()">
+              Skip me
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function search(query) {
+  if (query.length < 3) {
+    filteredBooks = books;
+    displayBooks();
+    return;
+  }
+
+  filteredBooks = books.filter((book) =>
+    book.title.toLowerCase().includes(query.toLowerCase())
+  );
+
+  console.log(filteredBooks);
+  displayBooks(filteredBooks);
+}
 
 function addCart() {
   removeCard;
@@ -93,13 +117,6 @@ function deleteShoppingCart(event) {
   let removedCart = event.target.closest(".list-item");
 
   removedCart.remove();
-}
-
-function searchImages(query) {
-  asin.filter((photo) =>
-    asin.title.toLowercase().includes(query.toLowerCase())
-  );
-  fetchCards(query);
 }
 
 window.onload = () => {
